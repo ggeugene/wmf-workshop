@@ -1,9 +1,13 @@
 const path = require('path');
-const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+
+const deps = require('./package.json').dependencies;
 
 module.exports = {
-  entry: './src/index.js',
+  output: {
+    publicPath: 'http://localhost:3001/'
+  },
   mode: 'development',
   module: {
     rules: [
@@ -51,18 +55,33 @@ module.exports = {
     ]
   },
   resolve: { extensions: ['*', '.js', '.jsx'] },
-  output: {
-    path: path.resolve(__dirname, 'dist/'),
-    publicPath: '/dist/',
-    filename: 'bundle.js'
-  },
   devServer: {
-    static: {
-      directory: path.join(__dirname, 'public')
-    },
-    port: 3000,
+    port: 3001,
     hot: true,
     historyApiFallback: true
   },
-  plugins: [new HtmlWebpackPlugin()]
+  plugins: [
+    new ModuleFederationPlugin({
+      name: 'episode',
+      filename: 'remoteEntry.js',
+      remotes: {
+        root: 'root@http://localhost:3000/remoteEntry.js'
+      },
+      exposes: {
+        './Episode': './src/modules/Episode'
+      },
+      shared: {
+        ...deps,
+        react: {
+          singleton: true,
+          requiredVersion: deps.react
+        },
+        'react-dom': {
+          singleton: true,
+          requiredVersion: deps['react-dom']
+        }
+      }
+    }),
+    new HtmlWebpackPlugin({ template: './public/index.html' })
+  ]
 };

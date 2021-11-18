@@ -2,13 +2,13 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import gql from 'graphql-tag';
 import { useQuery } from '@apollo/client';
-import Loader from '../../shared/Loader';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Fab from '@mui/material/Fab';
 
-import { Character } from './components/Character/Character';
+import Character from './components/Character';
+import Loader from 'root/Loader';
 
 import styles from './Episode.scss';
 
